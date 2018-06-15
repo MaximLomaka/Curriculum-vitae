@@ -12,6 +12,9 @@ class Department(models.Model):
     def get_groups(self):
         return self.group_set.all()
 
+    def get_groups_count(self):
+        return self.group_set.count()
+
 
 class Group(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, default=None)
@@ -44,6 +47,9 @@ class Person(models.Model):
     def get_resume(self):
         return self.resume_set.all()
 
+    def get_resume_count(self):
+        return self.resume_set.count()
+
 
 class Resume(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE, default=None)
@@ -71,12 +77,10 @@ class Resume(models.Model):
 class TechnicalExpertise(models.Model):
     resume = models.ForeignKey(Resume, on_delete=models.CASCADE, default=None)
     description = models.TextField()
+    index = models.SmallIntegerField(default=0)
 
     def __str__(self):
-        return self.resume.person.get_full_name()
-
-    def expertise_as_list(self):
-        return self.description.split('\n')
+        return self.description[:10] + '...'
 
 
 class ToolAndFramework(models.Model):
@@ -86,20 +90,21 @@ class ToolAndFramework(models.Model):
     index = models.SmallIntegerField(default=0)
 
     def __str__(self):
-        return self.resume.person.get_full_name()
+        return self.name
 
 
 class Project(models.Model):
     resume = models.ForeignKey(Resume, on_delete=models.CASCADE, default=None)
     is_nda = models.BooleanField(default=False)
-    project_name = models.CharField(max_length=255)
+    project_title = models.CharField(max_length=255)
+    nda_title = models.CharField(max_length=255, blank=True, null=True)
     description = models.TextField()
     team = models.CharField(max_length=255)
     role = models.CharField(max_length=255)
     skills = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.project_name
+        return self.project_title
 
 
 class Communication(models.Model):
@@ -108,10 +113,7 @@ class Communication(models.Model):
     index = models.SmallIntegerField(default=0)
 
     def __str__(self):
-        return self.resume.person.get_full_name()
-
-    def communication_as_list(self):
-        return self.description.split('\n')
+        return self.description[:10] + '...'
 
 
 class Education(models.Model):
@@ -122,4 +124,4 @@ class Education(models.Model):
     index = models.SmallIntegerField(default=0)
 
     def __str__(self):
-        return self.resume.person.get_full_name()
+        return self.place[:10] + '...'
